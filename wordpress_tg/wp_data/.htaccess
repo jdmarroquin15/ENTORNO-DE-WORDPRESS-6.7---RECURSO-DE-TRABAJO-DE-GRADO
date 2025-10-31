@@ -13,10 +13,6 @@ RewriteCond %{QUERY_STRING} action=async_litespeed
 RewriteRule .* - [E=noabort:1]
 ### marker ASYNC end ###
 
-### marker CACHE RESOURCE start ###
-RewriteRule wp-content/.*/[^/]*(responsive|css|js|dynamic|loader|fonts)\.php - [E=cache-control:max-age=3600]
-### marker CACHE RESOURCE end ###
-
 ### marker DROPQS start ###
 CacheKeyModify -qs:fbclid
 CacheKeyModify -qs:gclid
@@ -36,5 +32,11 @@ CacheKeyModify -qs:_ga
 # Las directivas (líneas) entre «BEGIN WordPress» y «END WordPress» son
 # generadas dinámicamente y solo deberían ser modificadas mediante filtros de WordPress.
 # Cualquier cambio en las directivas que hay entre esos marcadores serán sobrescritas.
+
+<Files xmlrpc.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
 
 # END WordPress

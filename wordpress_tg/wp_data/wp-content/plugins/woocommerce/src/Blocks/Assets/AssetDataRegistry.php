@@ -3,6 +3,7 @@ namespace Automattic\WooCommerce\Blocks\Assets;
 
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Domain\Services\Hydration;
+use Automattic\WooCommerce\Internal\Logging\RemoteLogger;
 use Exception;
 use InvalidArgumentException;
 
@@ -85,10 +86,11 @@ class AssetDataRegistry {
 			'currency'               => $this->get_currency_data(),
 			'currentUserId'          => get_current_user_id(),
 			'currentUserIsAdmin'     => current_user_can( 'manage_woocommerce' ),
-			'currentThemeIsFSETheme' => wc_current_theme_is_fse_theme(),
+			'currentThemeIsFSETheme' => wp_is_block_theme(),
 			'dateFormat'             => wc_date_format(),
 			'homeUrl'                => esc_url( home_url( '/' ) ),
 			'locale'                 => $this->get_locale_data(),
+			'isRemoteLoggingEnabled' => wc_get_container()->get( RemoteLogger::class )->is_remote_logging_allowed(),
 			'dashboardUrl'           => wc_get_account_endpoint_url( 'dashboard' ),
 			'orderStatuses'          => $this->get_order_statuses(),
 			'placeholderImgSrc'      => wc_placeholder_img_src(),
@@ -385,7 +387,7 @@ class AssetDataRegistry {
 			$this->execute_lazy_data();
 
 			$data                          = rawurlencode( wp_json_encode( $this->data ) );
-			$wc_settings_script            = "var wcSettings = wcSettings || JSON.parse( decodeURIComponent( '" . esc_js( $data ) . "' ) );";
+			$wc_settings_script            = "var wcSettings = JSON.parse( decodeURIComponent( '" . esc_js( $data ) . "' ) );";
 			$preloaded_api_requests_script = '';
 
 			if ( count( $this->preloaded_api_requests ) > 0 ) {
